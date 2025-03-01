@@ -1,11 +1,11 @@
 # Real Estate Web Application
 
 <div align="center">
-  <div align="left" width="50%">
+  <div align="left" width="45%">
     
   ## 🌟 Overview
   This **Real Estate Web Application** is a **MERN stack** project designed to streamline property management and searching. Users can explore, list, and manage properties efficiently with an intuitive interface.
-  </div> <img src="https://github.com/user-attachments/assets/a36617ec-85d3-4d01-876d-dde9b6678c37" alt="Real Estate Website" width="45%" align="right"> </div>
+  </div> <img src="https://github.com/user-attachments/assets/a36617ec-85d3-4d01-876d-dde9b6678c37" alt="Real Estate Website" width="55%" align="right"> </div>
 
    ## 🚀 Features
   - **🔑 User Authentication** – Secure login/register with JWT authentication
