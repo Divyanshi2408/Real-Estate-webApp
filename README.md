@@ -36,7 +36,6 @@
 </div>
 <br/>
 
-<div align="center">
 
   ## 📌 Installation  
   ```bash
