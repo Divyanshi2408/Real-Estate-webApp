@@ -22,9 +22,6 @@
   - **Database:** MongoDB  
   - **Authentication:** JWT  
 
-
-
-
   ## 📌 Installation  
   ```bash
   git clone https://github.com/Divyanshi2408/Real-Estate-webApp.git
@@ -33,3 +30,11 @@
   node server.js
   cd frontend
   npm run dev
+```
+## 🤝 Contributing
+Contributions are welcome! Feel free to submit a pull request.
+
+## 📩 Contact
+For any inquiries, reach out to: divyanshipal2808@gmail.com
+
+Happy Coding! 🚀
