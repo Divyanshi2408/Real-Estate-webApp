@@ -1,4 +1,4 @@
-# 🏡 Real Estate Web Application
+<h1 align="center">🏡 Real Estate Web Application</h1>
   
   ## 🌟 Overview
   This **Real Estate Web Application** is a **MERN stack** project designed to streamline property management and searching. Users can explore, list, and manage properties efficiently with an intuitive interface.
@@ -8,13 +8,13 @@
 
   ## 🚀 Features  
   
-  - **🔑 User Authentication** – Secure login/register with JWT authentication  
-  - **🏠 Property Listings** – Users can add, edit, and delete properties  
-  - **🔍 Advanced Search & Filtering** – Find properties based on location, price, type, and more  
-  - **🛒 Wishlist & Favorites** – Save properties for future reference  
-  - **📸 Image Upload** – Upload multiple images per property listing  
-  - **🗄️ Admin Dashboard** – Manage users, properties, and website analytics  
-  - **📊 Analytics & Reports** – View user activity and property insights  
+  - **User Authentication** – Secure login/register with JWT authentication  
+  - **Property Listings** – Users can add, edit, and delete properties  
+  - **Advanced Search & Filtering** – Find properties based on location, price, type, and more  
+  - **Wishlist & Favorites** – Save properties for future reference  
+  - **Image Upload** – Upload multiple images per property listing  
+  - **Admin Dashboard** – Manage users, properties, and website analytics  
+  - **Analytics & Reports** – View user activity and property insights  
 
   ## 🛠️ Tech Stack  
   - **Frontend:** React, Tailwind CSS  
