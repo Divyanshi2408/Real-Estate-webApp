@@ -21,13 +21,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerUser(formData);
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify({ email: formData.email, role: formData.role }));
-
+      await registerUser(formData);
       navigate("/login");
     } catch (error) {
-      setMessage("Registration failed. Please try again.");
+      setMessage(typeof error === "string" ? error : "Registration failed. Please try again.");
     }
   };
 
