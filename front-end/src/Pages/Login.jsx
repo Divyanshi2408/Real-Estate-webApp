@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext"; // Import AuthContext
 import { loginUser } from "../services/userService";
 import heroBg from "../assets/Login-Hero.png";
-import { FaRegUser } from "react-icons/fa";
+import { FaRegUser, FaArrowRight } from "react-icons/fa";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -69,9 +69,9 @@ const Login = () => {
                             type="password" placeholder="Password" value={password} 
                             onChange={(e) => setPassword(e.target.value)} required 
                         />
-                        <button className="bg-gradient-to-r  w-full text-xl font-semibold px-6 py-2 rounded-lg text-white hover:bg-gradient-to-l from-white/60 to-white/10" 
+                        <button className="flex items-center justify-center gap-2 bg-gradient-to-r  w-full text-xl font-semibold px-6 py-2 rounded-lg text-white hover:bg-gradient-to-l from-white/60 to-white/10" 
                             type="submit">
-                            Login →
+                            Login <FaArrowRight className="text-base" />
                         </button>
                     </form>
 

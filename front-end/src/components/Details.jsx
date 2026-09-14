@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchPropertyById, likeProperty, saveProperty, deleteProperty } from "../services/propertyService";
 import { FaEdit, FaHeart, FaBookmark, FaCity, FaMapMarkerAlt, FaDollarSign } from 'react-icons/fa';
@@ -26,7 +27,7 @@ const Details = () => {
           setMainImage(
             data.photos[0].startsWith("http") 
               ? data.photos[0] 
-              : `http://localhost:5000/uploads/${data.photos[0]}`
+              : `${API_BASE_URL}/uploads/${data.photos[0]}`
           );
         }
       } catch (err) {
@@ -86,7 +87,7 @@ const Details = () => {
           {property.photos.map((photo, index) => (
             <img
               key={index}
-              src={photo.startsWith("http") ? photo : `http://localhost:5000/uploads/${photo}`}
+              src={photo.startsWith("http") ? photo : `${API_BASE_URL}/uploads/${photo}`}
               // Directly use the backend-provided URL
               alt={`Property ${index + 1}`}
               className="w-full h-32 object-cover rounded-md shadow-md cursor-pointer transition-transform transform hover:scale-110"

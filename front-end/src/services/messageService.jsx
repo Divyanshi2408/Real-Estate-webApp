@@ -1,9 +1,10 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
-const API_URL = "http://localhost:5000/api/messages";
+const API_URL = `${API_BASE_URL}/api/messages`;
 
 
-// 🔹 Fetch Messages for Property Owner
+// Fetch Messages for Property Owner
 export const fetchMessages = async (token) => {
   try {
     const response = await axios.get(API_URL, {
@@ -16,7 +17,7 @@ export const fetchMessages = async (token) => {
 };
 
 
-// 🔹 Send a Message to Property Owner
+// Send a Message to Property Owner
 export const sendMessage = async (propertyId, message, token) => {
   try {
     const token = localStorage.getItem("token");

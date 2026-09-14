@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
-const API_URL = "http://localhost:5000/api/properties"; // Base URL for properties
+const API_URL = `${API_BASE_URL}/api/properties`; // Base URL for properties
 
-// ✅ Add a new property
+// Add a new property
 export const addProperty = async (propertyData, token) => {
   try {
     const response = await axios.post(API_URL, propertyData, {
@@ -17,17 +18,21 @@ export const addProperty = async (propertyData, token) => {
   }
 };
 
-// ✅ Get all properties
-export const fetchAllProperties = async () => {
+// Get all properties. Pass filters to have the backend do the filtering
+// (e.g. { city: "Delhi", type: "villa", minPrice: 50000, maxPrice: 900000, q: "sunny" })
+export const fetchAllProperties = async (filters = {}) => {
   try {
-    const response = await axios.get(API_URL);
+    const params = Object.fromEntries(
+      Object.entries(filters).filter(([, value]) => value !== "" && value !== null && value !== undefined && value !== 0)
+    );
+    const response = await axios.get(API_URL, { params });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || error.message);
   }
 };
 
-// ✅ Get a property by ID
+// Get a property by ID
 export const fetchPropertyById = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/${id}`);
@@ -37,7 +42,7 @@ export const fetchPropertyById = async (id) => {
   }
 };
 
-// ✅ Update a property (Requires Authorization)
+// Update a property (Requires Authorization)
 export const updateProperty = async (id, propertyData, token) => {
   try {
     const response = await axios.put(`${API_URL}/${id}`, propertyData, {
@@ -52,7 +57,7 @@ export const updateProperty = async (id, propertyData, token) => {
   }
 };
 
-// ✅ Delete a property (Requires Authorization)
+// Delete a property (Requires Authorization)
 export const deleteProperty = async (id, token) => {
   try {
     const response = await axios.delete(`${API_URL}/${id}`, {
@@ -78,7 +83,7 @@ export const likeProperty = async (id) => {
   }
 };
 
-// ✅ Save a property
+// Save a property
 export const saveProperty = async (id) => {
   try {
     const response = await axios.post(`${API_URL}/save/${id}`, null, {
@@ -93,7 +98,7 @@ export const saveProperty = async (id) => {
 };
 export const fetchLikedProperties = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/api/properties/userDashboard/liked", {
+    const response = await axios.get(`${API_BASE_URL}/api/properties/userDashboard/liked`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`, // assuming you store the token in localStorage
       },
@@ -107,7 +112,7 @@ export const fetchLikedProperties = async () => {
 // Fetch saved properties
 export const fetchSavedProperties = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/api/properties/userDashboard/saved", {
+    const response = await axios.get(`${API_BASE_URL}/api/properties/userDashboard/saved`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`, // assuming you store the token in localStorage
       },
@@ -130,7 +135,7 @@ export const toggleLikeProperty = async (id) => {
   }
 };
 
-// ✅ Save/Unsave Property (Frontend)
+// Save/Unsave Property (Frontend)
 export const toggleSaveProperty = async (id) => {
   try {
       const response = await axios.post(`${API_URL}/save/${id}`, null, {
@@ -146,7 +151,7 @@ export const toggleSaveProperty = async (id) => {
 
 export const fetchOwnerProperties = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/api/properties/owner/dashboard", {
+    const response = await axios.get(`${API_BASE_URL}/api/properties/owner/dashboard`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`, 
       },
@@ -158,7 +163,7 @@ export const fetchOwnerProperties = async () => {
 };
 // export const fetchMessagesByPropertyId = async (propertyId) => {
 //   const token = localStorage.getItem("token");
-//   const response = await axios.get(`http://localhost:5000/api/messages/${propertyId}`, {
+//   const response = await axios.get(`${API_BASE_URL}/api/messages/${propertyId}`, {
 //     headers: { Authorization: `Bearer ${token}` },
 //   });
 //   return response.data;

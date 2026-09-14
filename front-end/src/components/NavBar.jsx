@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext"; // Import the context
 import { fetchAllProperties } from "../services/propertyService";
 import logo from "../assets/logo.png";
-import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
+import { FaSearch, FaBars, FaTimes, FaArrowRight, FaHeart } from "react-icons/fa";
 import { MdHomeWork } from "react-icons/md";
 
 const NavBar = () => {
@@ -97,6 +97,9 @@ const NavBar = () => {
 
         {user ? (
           <>
+            <Link to="/favorites" className="px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition flex items-center gap-2">
+              <FaHeart /> Favorites
+            </Link>
             <Link to={getDashboardLink()} className="px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition">
               Dashboard
             </Link>
@@ -106,11 +109,11 @@ const NavBar = () => {
           </>
         ) : (
           <>
-            <Link to="/login" className="px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition">
-              Login →
+            <Link to="/login" className="flex items-center gap-1.5 px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition">
+              Login <FaArrowRight className="text-sm" />
             </Link>
-            <Link to="/register" className="px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition">
-              Register →
+            <Link to="/register" className="flex items-center gap-1.5 px-4 py-2 font-bold rounded-full hover:bg-white hover:text-red-700 transition">
+              Register <FaArrowRight className="text-sm" />
             </Link>
           </>
         )}
@@ -136,6 +139,9 @@ const NavBar = () => {
 
           {user ? (
             <>
+              <Link to="/favorites" className="py-2 w-full text-center hover:bg-red-600 flex items-center justify-center gap-2" onClick={() => setMenuOpen(false)}>
+                <FaHeart /> Favorites
+              </Link>
               <Link to={getDashboardLink()} className="py-2 w-full text-center hover:bg-red-600" onClick={() => setMenuOpen(false)}>
                 Dashboard
               </Link>
@@ -145,11 +151,11 @@ const NavBar = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="py-2 w-full text-center hover:bg-red-600" onClick={() => setMenuOpen(false)}>
-                Login →
+              <Link to="/login" className="flex items-center justify-center gap-1.5 py-2 w-full text-center hover:bg-red-600" onClick={() => setMenuOpen(false)}>
+                Login <FaArrowRight className="text-sm" />
               </Link>
-              <Link to="/register" className="py-2 w-full text-center hover:bg-red-600" onClick={() => setMenuOpen(false)}>
-                Register →
+              <Link to="/register" className="flex items-center justify-center gap-1.5 py-2 w-full text-center hover:bg-red-600" onClick={() => setMenuOpen(false)}>
+                Register <FaArrowRight className="text-sm" />
               </Link>
             </>
           )}

@@ -42,7 +42,7 @@ router.get("/", authenticateToken, async (req, res) => {
     }
 });
 
-// 📩 Send a message to a property owner
+// Send a message to a property owner
 router.post("/", authenticateToken, async (req, res) => {
     const { propertyId, message } = req.body;
 
@@ -64,7 +64,7 @@ router.post("/", authenticateToken, async (req, res) => {
 });
 
 
-// 📩 Reply to a message
+// Reply to a message
 
 // router.post("/reply/:messageId", authenticateToken, async (req, res) => {
 //     const { replyMessage } = req.body;
@@ -158,7 +158,7 @@ router.get("/user", authenticateToken, async (req, res) => {
         // Find replies where the logged-in user is the receiver
         const messageIds = userMessages.map(msg => msg._id);
         const replies = await Message.find({ parentMessage: { $in: messageIds } })
-            .populate("senderId", "name email")  // ✅ Populate sender info
+            .populate("senderId", "name email")  // Populate sender info
             .lean();
 
         // Attach replies to their corresponding messages
@@ -181,7 +181,7 @@ router.get("/replies/:messageId", authenticateToken, async (req, res) => {
 
     try {
         const replies = await Message.find({ parentMessage: messageId })
-            .populate("senderId", "name email")  // ✅ Populate sender info
+            .populate("senderId", "name email")  // Populate sender info
             .lean();
 
         if (!replies || replies.length === 0) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/userService";
 import regisBg from "../assets/registerBg.jpg";
-import { FaUserPlus } from "react-icons/fa";
+import { FaUserPlus, FaArrowRight } from "react-icons/fa";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -90,10 +90,10 @@ const Register = () => {
             </select>
 
             <button
-              className="bg-gradient-to-r from-white/60 to-white/10 w-full text-xl font-semibold px-6 py-2 rounded-lg text-white hover:bg-gradient-to-l "
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-white/60 to-white/10 w-full text-xl font-semibold px-6 py-2 rounded-lg text-white hover:bg-gradient-to-l "
               type="submit"
             >
-              Register →
+              Register <FaArrowRight className="text-base" />
             </button>
             <p className="text-center text-sm text-gray-200">
             Already have an account? <Link to="/login" className="text-blue-400">Login here</Link>

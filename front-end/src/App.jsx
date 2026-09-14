@@ -8,6 +8,7 @@ import PropertyDetails from "./Pages/PropertyDetails";
 import Dashboard from "./Pages/Dashboard";
 import PropertyManagement from "./Pages/PropertyManagement";
 import UserManagement from "./Pages/UserManagement";
+import ContactMessages from "./Pages/ContactMessages";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import UserDashboard from "./Pages/UserDashboard";
@@ -16,9 +17,10 @@ import { AuthProvider } from "./context/AuthContext";
 import PropertyPage from "./Pages/Propertpage";
 import "./App.css"
 import OwnerDashboard from "./Pages/OwnerDashboard";
-import Details from "./components/Details";
 import AboutPage from "./Pages/AboutPage";
 import ContactPage from "./Pages/ContactPage";
+import Favorites from "./Pages/Favorites";
+import NotFound from "./Pages/NotFound";
 
 
 
@@ -60,9 +62,9 @@ function App() {
           <Route path="/owner-dashboard" element={<OwnerDashboard />} />
           
           <Route path="/edit-property/:id" element={<EditProperty />} />
-          <Route path="/details/:id" element={<Details />} />
           <Route path="/AboutPage" element={<AboutPage/>}/>
           <Route path="/contact" element={<ContactPage/>}/>
+          <Route path="/favorites" element={<Favorites />} />
 
           
           {/* Nested Admin Routes */}
@@ -70,8 +72,11 @@ function App() {
             <Route index element={<Navigate to="properties" replace />} />
             <Route path="properties" element={<PropertyManagement />} />
             <Route path="users" element={<UserManagement />} />
-            
+            <Route path="messages" element={<ContactMessages />} />
           </Route>
+
+          {/* Catch-all: keep this last */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </Router>

@@ -1,23 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { FaSearch, FaArrowUp } from "react-icons/fa";
+import { FaSearch, FaArrowUp, FaThLarge, FaList, FaBuilding, FaSmile, FaCity } from "react-icons/fa";
 import { fetchAllProperties } from "../services/propertyService";
 import heroBg from "../assets/hero-section.png";
-import errorImage from "../assets/ErrorImage.png";
 import { FaShieldAlt, FaStar, FaLightbulb, FaEye, FaUsers } from "react-icons/fa";
-import { BiArea } from "react-icons/bi";
-import { RiRoadMapLine } from "react-icons/ri";
-import { TbListDetails } from "react-icons/tb";
+import PropertyCard from "../components/PropertyCard";
+import BrowseByCity from "../components/BrowseByCity";
+import BrowseByType from "../components/BrowseByType";
+import HowItWorks from "../components/HowItWorks";
+import Testimonials from "../components/Testimonials";
 
 
 const HomePage = () => {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
-  const [filters, setFilters] = useState({ type: "", location: "", size: "", price: 300000 });
+  const [filters, setFilters] = useState({ keyword: "", type: "", location: "", size: "", price: 300000 });
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [loading, setLoading] = useState(true);
   const propertiesSectionRef = useRef(null);
   const [size, setSize] = useState(1);
+  const [sortBy, setSortBy] = useState("");
+  const [view, setView] = useState("grid"); // "grid" | "list"
 
   const values = [
     { title: "Integrity", desc: "Upholding the highest professional and ethical standards.", icon: <FaShieldAlt /> },
@@ -72,13 +75,41 @@ const HomePage = () => {
 
   const handleSearch = () => {
     let filtered = properties;
+    if (filters.keyword) {
+      const kw = filters.keyword.toLowerCase().trim();
+      filtered = filtered.filter(
+        (prop) =>
+          prop.title?.toLowerCase().includes(kw) ||
+          prop.city?.toLowerCase().includes(kw) ||
+          prop.locality?.toLowerCase().includes(kw)
+      );
+    }
     if (filters.type) filtered = filtered.filter((prop) => prop.type.toLowerCase().trim() === filters.type.toLowerCase().trim());
     if (filters.location) filtered = filtered.filter((prop) => prop.city.toLowerCase().trim() === filters.location.toLowerCase().trim());
     if (filters.size) filtered = filtered.filter((prop) => prop.size === filters.size);
     if (filters.price) filtered = filtered.filter((prop) => prop.price <= filters.price);
-    setFilteredProperties(filtered.slice(0, 6));
+    setFilteredProperties(sortProperties(filtered).slice(0, 9));
     propertiesSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const sortProperties = (list) => {
+    const sorted = [...list];
+    if (sortBy === "priceLow") sorted.sort((a, b) => a.price - b.price);
+    else if (sortBy === "priceHigh") sorted.sort((a, b) => b.price - a.price);
+    else if (sortBy === "newest") sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    else if (sortBy === "sizeLarge") sorted.sort((a, b) => b.size - a.size);
+    return sorted;
+  };
+
+  useEffect(() => {
+    setFilteredProperties((prev) => sortProperties(prev));
+  }, [sortBy]);
+
+  const stats = [
+    { icon: <FaBuilding />, value: properties.length ? `${properties.length}+` : "—", label: "Properties Listed" },
+    { icon: <FaCity />, value: new Set(properties.map((p) => p.city)).size || "—", label: "Cities Covered" },
+    { icon: <FaSmile />, value: "500+", label: "Happy Clients" },
+  ];
 
   return (
     <div className="relative w-full min-h-screen bg-white">
@@ -93,6 +124,17 @@ const HomePage = () => {
           Made Easy to<br />Buy & Sell Property
         </h2>
         <div className="bg-gradient-to-r from-white/20 to-white/5 backdrop-blur-sm border border-white/10 bg-opacity-50 rounded-lg px-10 py-5 text-xl flex flex-col gap-4">
+          <div className="relative">
+            <input
+              type="text"
+              name="keyword"
+              placeholder="Search by title, city, or locality..."
+              value={filters.keyword}
+              onChange={handleFilterChange}
+              className="w-full py-2 pl-9 pr-4 text-base font-medium text-white bg-white/10 border border-white/20 rounded outline-none placeholder:text-gray-300"
+            />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-sm" />
+          </div>
           <select name="type" className="py-2 pr-4 font-semibold text-white  rounded outline-none" onChange={handleFilterChange}>
             <option className="bg-black" value="">Type</option>
             <option className="bg-black" value="Home">Home</option>
@@ -166,6 +208,20 @@ const HomePage = () => {
           </button>
         </div>
       </div>
+
+      {/* Stats Bar */}
+      <div className="bg-red-700 text-white py-8">
+        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-6 px-6 text-center">
+          {stats.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className="text-3xl mb-2">{stat.icon}</div>
+              <p className="text-3xl font-bold max-sm:text-xl">{stat.value}</p>
+              <p className="text-sm text-red-100 uppercase tracking-wide max-sm:text-xs">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/*About us*/}
       <div className="text-center mt-10 mb-10">
         <h2 className="text-4xl text-gray-600 max-md:text-xl px-2">Discover Your Perfect Space with Bricks & Beams, Where Dreams Find Their Foundation
@@ -201,51 +257,57 @@ const HomePage = () => {
       </div>
 
 
+      {/* Browse by City / Type */}
+      <BrowseByCity properties={properties} />
+      <BrowseByType properties={properties} />
+
+      {/* How It Works */}
+      <HowItWorks />
+
       {/* Property Listings */}
       <div ref={propertiesSectionRef} className="flex flex-col justify-center items-center max-w-7xl mx-auto p-6">
         <h2 className="text-4xl font-bold text-red-700 mb-6 text-center">Featured Properties</h2>
+
+        {/* Sort + view toggle */}
+        <div className="w-full flex flex-wrap gap-3 justify-end items-center mb-6">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-red-600"
+          >
+            <option value="">Sort: Default</option>
+            <option value="priceLow">Price: Low to High</option>
+            <option value="priceHigh">Price: High to Low</option>
+            <option value="newest">Newest First</option>
+            <option value="sizeLarge">Size: Largest First</option>
+          </select>
+          <div className="flex rounded-md overflow-hidden border border-gray-300">
+            <button
+              onClick={() => setView("grid")}
+              className={`px-3 py-2 transition ${view === "grid" ? "bg-red-700 text-white" : "bg-white text-gray-600 hover:bg-gray-100"}`}
+              aria-label="Grid view"
+            >
+              <FaThLarge />
+            </button>
+            <button
+              onClick={() => setView("list")}
+              className={`px-3 py-2 transition ${view === "list" ? "bg-red-700 text-white" : "bg-white text-gray-600 hover:bg-gray-100"}`}
+              aria-label="List view"
+            >
+              <FaList />
+            </button>
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex justify-center items-center h-40">
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-red-700"></div>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className={view === "grid" ? "grid md:grid-cols-2 lg:grid-cols-3 gap-8 w-full" : "flex flex-col gap-6 w-full"}>
             {filteredProperties.length > 0 ? (
               filteredProperties.map((property) => (
-                <div className="block" key={property._id}>
-                  <div className="relative bg-white shadow-xl rounded-lg overflow-hidden hover:shadow-2xl transition duration-300 group">
-
-                    {/* Property Image */}
-                    <img
-                    src={
-                      property.photos.length > 0
-                        ? property.photos[0].startsWith("http")
-                          ? property.photos[0] // Use directly if already a full URL
-                          : `http://localhost:5000/uploads/${property.photos[0]}` // Add correct prefix
-                        : errorImage
-                    }
-                    alt={property.title}
-                    className="w-full h-60 object-cover hover:scale-105 transition-all"
-                  />
-
-                    {/* Property Details */}
-                    <div className="p-5 relative">
-                      
-                      <h3 className="text-2xl mt-2 font-semibold text-gray-900 flex justify-between">${property.price.toLocaleString()} <h4 className="text-xl mt-1 text-red-700 flex"><BiArea className="w-7 h-7 text-red" /> {property.size}sqft</h4> </h3>
-                      
-                      <p className="mt-3 text-gray-600 font-semibold text-lg flex "><RiRoadMapLine className="w-7 h-7  mr-1"/>{property.city}</p>
-
-
-                      {/* View Details Button (Hidden by default, appears on hover at bottom-right) */}
-                      <Link to={`/property/${property._id}`} key={property._id} className="absolute bottom-5 right-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <button className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold shadow-lg hover:bg-red-700 transition flex gap-2">
-                          View Details <TbListDetails className="w-5 h-5"/>
-                        </button>
-                      </Link>
-                    </div>
-
-                  </div>
-                </div>
+                <PropertyCard key={property._id} property={property} variant={view} />
               ))
             ) : (
               <p className="text-center text-gray-500">No properties found.</p>
@@ -254,6 +316,9 @@ const HomePage = () => {
         )}
         <Link to={"/propertyPage"}><button className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold shadow-lg mt-10 item-center hover:bg-white hover:text-red-700">View All Properties</button></Link>
       </div>
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* Back to Top Button */}
       {showScrollButton && (

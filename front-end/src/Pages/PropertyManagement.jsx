@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config";
 import { useLocation,useNavigate} from "react-router-dom";
 
 const PropertyManagement = () => {
@@ -10,7 +11,7 @@ const PropertyManagement = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/admin/all", {
+        const response = await fetch(`${API_BASE_URL}/api/admin/all`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -23,7 +24,7 @@ const PropertyManagement = () => {
         const data = await response.json();
         if (!Array.isArray(data)) throw new Error("Unexpected response format");
 
-        // ✅ Check if user clicked "Active Properties"
+        // Check if user clicked "Active Properties"
         const queryParams = new URLSearchParams(location.search);
         const isActive = queryParams.get("active") === "true";
 
@@ -43,7 +44,7 @@ const PropertyManagement = () => {
 
   const handleApproval = async (id, status) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/properties/${id}/approve`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/properties/${id}/approve`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +68,7 @@ const PropertyManagement = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/properties/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/properties/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -107,9 +108,9 @@ const PropertyManagement = () => {
               </p>
               {property.photos && property.photos.length > 0 && (
                 <img
-                  src={property.photos[0].startsWith("http") ? property.photos[0] : `http://localhost:5000/uploads/${property.photos[0]}`}
+                  src={property.photos[0].startsWith("http") ? property.photos[0] : `${API_BASE_URL}/uploads/${property.photos[0]}`}
                   alt={property.name}
-                  onClick={() => navigate(`/details/${property._id}`)}
+                  onClick={() => navigate(`/property/${property._id}`)}
                   className="w-full h-60 object-cover hover:scale-102 transition hover:cursor-pointer"
                   onError={(e) => e.target.src = errorImage} // Fallback for broken images
                 />

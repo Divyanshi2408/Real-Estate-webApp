@@ -1,216 +1,171 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchAllProperties } from "../services/propertyService";
-import { Link } from "react-router-dom";
-import errorImage from "../assets/ErrorImage.png";
-import LandscapeCard from '../components/LandscapeCard';
+import PropertyCard from "../components/PropertyCard";
 
+const PROPERTY_TYPES = [
+  { value: "", label: "All Types" },
+  { value: "home", label: "Home" },
+  { value: "apartment", label: "Apartment" },
+  { value: "villa", label: "Villa" },
+  { value: "land", label: "Land" },
+];
+
+// Public "browse all properties" page. Anyone can view this — it only ever
+// shows approved listings (the backend's GET /api/properties already filters
+// to approvalStatus: "approved"), and it never touches the admin endpoints.
 const PropertyPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
-  const [filteredProperties, setFilteredProperties] = useState([]);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const propertiesPerPage = 9;
+  const [error, setError] = useState("");
 
-  const [filters, setFilters] = useState({
-    type: "",
-    location: "",
-    size: 0,
-    price: 0,
-  });
+  // Filters mirror the URL so links like the Home page's "Browse by City"
+  // tiles (/propertyPage?city=Delhi) work, and so a search here is shareable.
+  const [city, setCity] = useState(searchParams.get("city") || "");
+  const [type, setType] = useState(searchParams.get("type") || "");
+  const [q, setQ] = useState(searchParams.get("q") || "");
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
-  useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchAllProperties();
-        const approvedProperties = data
-          .filter(property => property.approvalStatus === "approved")
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by newest first
-          setTimeout(() => {
-            setProperties(approvedProperties);
-            setFilteredProperties(approvedProperties);
-            setLoading(false);
-          }, 300);
-      } catch (err) {
-        setTimeout(() => {
-          setError(err.message);
-          setLoading(false);
-        }, 1000);
-      }
-    };
-    fetchProperties();
-  }, []);
-
-  useEffect(() => {
-    let filtered = properties;
-    if (filters.type) {
-      filtered = filtered.filter(
-        prop => prop.type.toLowerCase() === filters.type.toLowerCase()
-      );
-    }
-    if (filters.location) {
-      filtered = filtered.filter(
-        prop => prop.city.toLowerCase() === filters.location.toLowerCase()
-      );
-    }
-    if (filters.size > 0) {
-      filtered = filtered.filter(prop => prop.size >= filters.size);
-    }
-    if (filters.price > 0) {
-      filtered = filtered.filter(prop => prop.price <= filters.price);
-    }
-    setFilteredProperties(filtered);
-    setCurrentPage(1);
-  }, [filters, properties]);
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handlePriceChange = (e) => {
-    setFilters({ ...filters, price: Number(e.target.value) });
-  };
-
-  const handleSizeChange = (e) => {
-    setFilters({ ...filters, size: Number(e.target.value) });
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      type: "",
-      location: "",
-      size: 0,
-      price: 0,
-    });
-    setFilteredProperties(properties);
-  };
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
-
-  const indexOfLastProperty = currentPage * propertiesPerPage;
-  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
-  const currentProperties = filteredProperties.slice(
-    indexOfFirstProperty,
-    indexOfLastProperty
+  const filters = useMemo(
+    () => ({ city, type, q, minPrice, maxPrice }),
+    [city, type, q, minPrice, maxPrice]
   );
 
-  const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await fetchAllProperties(filters);
+        setProperties(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+        setError(err.message || "Failed to load properties.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProperties();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [city, type, q, minPrice, maxPrice]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const next = {};
+    if (city) next.city = city;
+    if (type) next.type = type;
+    if (q) next.q = q;
+    if (minPrice) next.minPrice = minPrice;
+    if (maxPrice) next.maxPrice = maxPrice;
+    setSearchParams(next);
+  };
+
+  const clearFilters = () => {
+    setCity("");
+    setType("");
+    setQ("");
+    setMinPrice("");
+    setMaxPrice("");
+    setSearchParams({});
+  };
+
+  const hasActiveFilters = city || type || q || minPrice || maxPrice;
 
   return (
-    <div className="max-w-7xl mx-auto mt-20 p-6">
-      <h2 className="text-4xl font-bold text-gray-800 mb-6 text-center">
-        Property Listings
+    <div className="mt-24 max-w-7xl mx-auto p-6">
+      <h2 className="text-4xl font-bold text-gray-900 mb-2 text-center">
+        Browse Properties
       </h2>
+      <p className="text-gray-500 text-center mb-8">
+        {properties.length} propert{properties.length === 1 ? "y" : "ies"} available
+      </p>
+
+      {/* Filters */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-wrap gap-3 items-center justify-center mb-10 bg-gray-50 border border-gray-200 rounded-xl p-4"
+      >
+        <input
+          type="text"
+          placeholder="Search by title, city, or locality..."
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-red-700"
+        />
+        <input
+          type="text"
+          placeholder="City"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full sm:w-40 focus:outline-none focus:ring-2 focus:ring-red-700"
+        />
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full sm:w-40 focus:outline-none focus:ring-2 focus:ring-red-700"
+        >
+          {PROPERTY_TYPES.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <input
+          type="number"
+          placeholder="Min price"
+          value={minPrice}
+          min="0"
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full sm:w-32 focus:outline-none focus:ring-2 focus:ring-red-700"
+        />
+        <input
+          type="number"
+          placeholder="Max price"
+          value={maxPrice}
+          min="0"
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 text-sm w-full sm:w-32 focus:outline-none focus:ring-2 focus:ring-red-700"
+        />
+        <button
+          type="submit"
+          className="bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-red-800 transition"
+        >
+          Search
+        </button>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="text-sm font-medium text-gray-500 hover:text-red-700 transition px-2"
+          >
+            Clear filters
+          </button>
+        )}
+      </form>
 
       {error && (
-        <p className="text-red-600 bg-red-100 border border-red-400 px-4 py-2 rounded-md mb-4 text-center">
-          Error: {error}
+        <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-2 rounded-lg mb-6 text-center">
+          {error}
         </p>
       )}
-
-      <div className="bg-white shadow-xl p-6 rounded-2xl flex flex-wrap gap-6 justify-center items-center border border-gray-200">
-        <div className="flex flex-col">
-          <select
-            name="type"
-            className="p-3 rounded-lg bg-white transition cursor-pointer outline-none"
-            onChange={handleFilterChange}
-            value={filters.type}
-          >
-            <option value="">All Types</option>
-            <option value="Home">Home</option>
-            <option value="Apartment">Apartment</option>
-            <option value="Villa">Villa</option>
-          </select>
-        </div>
-        <div className="flex flex-col">
-          <select
-            name="location"
-            className="p-3 rounded-lg bg-white transition cursor-pointer outline-none"
-            onChange={handleFilterChange}
-            value={filters.location}
-          >
-            <option value="">All Locations</option>
-            <option value="Agra">Agra</option>
-            <option value="Delhi">Delhi</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Jaipur">Jaipur</option>
-            <option value="Bangalore">Bangalore</option>
-            <option value="Hyderabad">Hyderabad</option>
-            <option value="Pune">Pune</option>
-            <option value="Gurgaon">Gurgaon</option>
-          </select>
-        </div>
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-semibold">Min Size: <span className="font-semibold text-red-700">{filters.size} sq ft</span></label>
-          <input
-            type="range"
-            name="size"
-            min="500"
-            max="5000"
-            step="100"
-            value={filters.size}
-            onChange={handleSizeChange}
-            className="w-40 accent-red-700"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-gray-700 font-semibold">Max Price: <span className="font-semibold text-green-700">${filters.price}</span></label>
-          <input
-            type="range"
-            name="price"
-            min="50000"
-            max="1000000"
-            step="50000"
-            value={filters.price}
-            onChange={handlePriceChange}
-            className="w-40 accent-red-700"
-          />
-        </div>
-        <button
-          onClick={handleResetFilters}
-          className="px-6 py-2 bg-red-700 text-white font-semibold rounded-lg hover:bg-red-800 shadow-md transition transform hover:scale-105"
-        >
-          Reset values
-        </button>
-      </div>
 
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-red-700"></div>
         </div>
+      ) : properties.length > 0 ? (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {properties.map((property) => (
+            <PropertyCard key={property._id} property={property} variant="grid" />
+          ))}
+        </div>
       ) : (
-        <div>
-        <div className="grid max-sm:grid-cols-1 max-md:grid-cols-2 grid-cols-3 gap-12">
-          {currentProperties.length > 0 ? (
-            currentProperties.map((property) => (
-              <Link to={`/property/${property._id}`} key={property._id}>
-                <LandscapeCard property={property} />
-              </Link>
-            ))
-          ) : (
-            <p className="text-center text-gray-500">No properties found.</p>
-          )}
-        </div>
-        <div className="flex justify-center mt-6">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                className={`mx-1 px-4 py-2 rounded ${currentPage === i + 1 ? "bg-red-600 text-white" : "bg-gray-200"
-                  }`}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="text-center text-gray-500 py-12">
+          No properties found{hasActiveFilters ? " for these filters." : "."}
+        </p>
       )}
     </div>
   );

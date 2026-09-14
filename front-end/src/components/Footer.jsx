@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaTwitter, FaFacebookF, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -45,19 +46,25 @@ const Footer = () => {
         {/* Contact Info */}
         <div className="text-right max-sm:text-left">
           <h3 className="text-2xl font-semibold">Contact Us</h3>
-          <p className="text-gray-400 mt-4">📍 123 Real Estate St, City, Country</p>
-          <p className="text-gray-400 mt-2">📞 +1 234 567 890</p>
-          <p className="text-gray-400 mt-2">📧 support@brickandbeams.com</p>
+          <p className="text-gray-400 mt-4 flex items-center gap-2 justify-end max-sm:justify-start">
+            <FaMapMarkerAlt className="text-red-600 shrink-0" /> 123 Real Estate St, City, Country
+          </p>
+          <p className="text-gray-400 mt-2 flex items-center gap-2 justify-end max-sm:justify-start">
+            <FaPhoneAlt className="text-red-600 shrink-0" /> +1 234 567 890
+          </p>
+          <p className="text-gray-400 mt-2 flex items-center gap-2 justify-end max-sm:justify-start">
+            <FaEnvelope className="text-red-600 shrink-0" /> support@brickandbeams.com
+          </p>
         </div>
       </div>
 
       {/* Social Media & Copyright */}
       <div className="mt-12 border-t border-gray-700 pt-6 text-center">
-        <div className="flex justify-center space-x-6 text-2xl">
-          <a href="#" className="hover:text-red-600 transition">🐦</a>
-          <a href="#" className="hover:text-red-600 transition">📘</a>
-          <a href="#" className="hover:text-red-600 transition">📸</a>
-          <a href="#" className="hover:text-red-600 transition">🔗</a>
+        <div className="flex justify-center space-x-6 text-xl">
+          <a href="#" aria-label="Twitter" className="hover:text-red-600 transition"><FaTwitter /></a>
+          <a href="#" aria-label="Facebook" className="hover:text-red-600 transition"><FaFacebookF /></a>
+          <a href="#" aria-label="Instagram" className="hover:text-red-600 transition"><FaInstagram /></a>
+          <a href="#" aria-label="LinkedIn" className="hover:text-red-600 transition"><FaLinkedinIn /></a>
         </div>
         <p className="text-gray-500 text-lg mt-4">
           © {new Date().getFullYear()} Brick & Beams. All rights reserved.

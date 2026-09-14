@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { sendContactMessage } from "../services/contactService";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -10,15 +10,33 @@ const ContactPage = () => {
     interest: "buying",
     message: "",
   });
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Your message has been sent!");
+    setStatus("sending");
+    setErrorMessage("");
+
+    try {
+      await sendContactMessage(formData);
+      setStatus("success");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        contactMethod: "email",
+        interest: "buying",
+        message: "",
+      });
+    } catch (error) {
+      setStatus("error");
+      setErrorMessage(typeof error === "string" ? error : "Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -100,9 +118,16 @@ const ContactPage = () => {
           <textarea name="message" value={formData.message} onChange={handleChange}
             className="border p-3 rounded-lg w-full" placeholder="Your Message" rows="4" required></textarea>
 
-          <button type="submit"
-            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 transition duration-300">
-            Send Message
+          {status === "success" && (
+            <p className="text-green-700 font-medium">Your message has been sent! We'll get back to you soon.</p>
+          )}
+          {status === "error" && (
+            <p className="text-red-700 font-medium">{errorMessage}</p>
+          )}
+
+          <button type="submit" disabled={status === "sending"}
+            className="w-full bg-red-700 text-white py-3 rounded-lg font-semibold hover:bg-red-800 transition duration-300 disabled:opacity-60 disabled:cursor-not-allowed">
+            {status === "sending" ? "Sending..." : "Send Message"}
           </button>
         </form>
       </div>

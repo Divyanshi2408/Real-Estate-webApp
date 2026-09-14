@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const Property = require("../models/Property");
+const ContactMessage = require("../models/ContactMessage");
 const authorizeAdmin = require("../middleware/adminMiddleware");
 
 const router = express.Router();
@@ -14,7 +15,7 @@ router.get("/all", authorizeAdmin, async (req, res) => {
   }
 });
 
-// 🏡 Approve or Reject Property Listing
+// Approve or Reject Property Listing
 router.put("/properties/:id/approve", authorizeAdmin, async (req, res) => {
     try {
       const { status } = req.body; // "approved" or "rejected"
@@ -70,7 +71,7 @@ router.put("/properties/:id/approve", authorizeAdmin, async (req, res) => {
   
       
 
-// 👥 View All Users
+// View All Users
 router.get("/users", authorizeAdmin, async (req, res) => {
     try {
       const users = await User.find();
@@ -131,12 +132,16 @@ router.get("/dashboard/metrics", authorizeAdmin, async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalActiveProperties = await Property.countDocuments({ approvalStatus: "approved" });
+    const totalPendingProperties = await Property.countDocuments({ approvalStatus: "pending" });
     const totalBlockedUsers = await User.countDocuments({ status: "suspended" });
+    const newContactMessages = await ContactMessage.countDocuments({ status: "new" });
 
     res.status(200).json({
       totalUsers,
       totalActiveProperties,
+      totalPendingProperties,
       totalBlockedUsers,
+      newContactMessages,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
