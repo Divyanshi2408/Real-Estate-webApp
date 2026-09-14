@@ -302,7 +302,24 @@ const OwnerDashboard = () => {
                   className="w-full h-40 object-cover rounded-md mb-4"
                 />
 
-                <h3 className="text-xl font-semibold">{property.title}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">{property.title}</h3>
+                  <span
+                    className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                      property.approvalStatus === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : property.approvalStatus === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {property.approvalStatus === "approved"
+                      ? "Approved"
+                      : property.approvalStatus === "rejected"
+                      ? "Rejected"
+                      : "Pending approval"}
+                  </span>
+                </div>
                 <p className="text-gray-600">{property.city}</p>
                 <p className="text-gray-800 font-semibold">${property.price}</p>
                 <button

@@ -75,7 +75,7 @@ router.get("/", async (req, res) => {
       ];
     }
 
-    const properties = await Property.find(filter).populate("ownerId", "name email");
+    const properties = await Property.find(filter).sort({ createdAt: -1 }).populate("ownerId", "name email");
     res.status(200).json(properties);
   } catch (error) {
     res.status(500).json({ message: error.message });

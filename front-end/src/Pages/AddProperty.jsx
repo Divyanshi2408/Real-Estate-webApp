@@ -77,7 +77,7 @@ const AddProperty = () => {
       setSubmitting(true);
       await addProperty(formData, token);
       setFeedback({ type: "success", text: "Property added! Waiting for admin approval." });
-      setTimeout(() => navigate("/propertyPage"), 1200);
+      setTimeout(() => navigate("/owner-dashboard"), 1200);
     } catch (err) {
       setFeedback({ type: "error", text: err.message || "Error adding property. Please try again." });
     } finally {
